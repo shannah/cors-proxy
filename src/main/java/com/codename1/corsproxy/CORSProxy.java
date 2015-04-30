@@ -7,6 +7,8 @@ package com.codename1.corsproxy;
 
 import java.io.IOException;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebInitParam;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.http.HttpResponse;
@@ -15,6 +17,13 @@ import org.apache.http.HttpResponse;
  *
  * @author shannah
  */
+@WebServlet(
+        urlPatterns = {"/cn1-cors-proxy"},
+        initParams = { 
+            @WebInitParam(name="targetUri", value="{_target}"),
+            @WebInitParam(name="log", value="true")
+        }
+)
 public class CORSProxy extends org.mitre.dsmiley.httpproxy.URITemplateProxyServlet{
 
     

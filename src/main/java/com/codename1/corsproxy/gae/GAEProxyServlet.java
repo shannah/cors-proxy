@@ -33,6 +33,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.annotation.WebInitParam;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -46,6 +48,13 @@ import javax.servlet.http.HttpServletResponse;
  * @author gregw
  *
  */
+@WebServlet(
+        urlPatterns = {"/cn1-gae-cors-proxy"},
+        initParams = { 
+            @WebInitParam(name="targetUri", value="{_target}"),
+            @WebInitParam(name="log", value="true")
+        }
+)
 public class GAEProxyServlet implements Servlet
 {
     
