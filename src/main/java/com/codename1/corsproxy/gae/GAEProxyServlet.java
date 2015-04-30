@@ -55,7 +55,7 @@ import javax.servlet.http.HttpServletResponse;
             @WebInitParam(name="log", value="true")
         }
 )
-public class GAEProxyServlet implements Servlet
+public class GAEProxyServlet extends HttpServlet
 {
     
     private static final int BUFFER_SIZE = 2 * 1024 * 1024;
