@@ -44,4 +44,18 @@ There are two ways to "tell" your Codename One application about your proxy serv
 1. [Deploying on AppEngine](https://github.com/shannah/cors-proxy/wiki/Deploying-on-App-Engine)
 2. [Embedding Servlet into Existing Project](https://github.com/shannah/cors-proxy/wiki/Embedding-Servlet-into-Existing-Project)
 
+# Learn More
+
+1. Learn more about [Codename One](http://www.codenameone.com)
+
+# Credits
+
+1. The CORSProxy class extends [Smiley's HTTP Proxy](https://github.com/mitre/HTTP-Proxy-Servlet)
+2. The GAEProxyServlet class is adapted from [this servlet](http://www.javased.com/?source_dir=http-testing-harness/server-provider/src/main/java/org/sonatype/tests/http/server/jetty/impl/ProxyServlet.java) which was developed by Mort Bay Consulting Pty. Ltd.
+3. This project developed and maintained by [Steve Hannah](http://sjhannah.com)
+
+# License
+
+Apache 2.0 License
+
 
