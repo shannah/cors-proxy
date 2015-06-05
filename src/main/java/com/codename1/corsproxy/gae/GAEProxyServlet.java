@@ -15,7 +15,6 @@
 
 package com.codename1.corsproxy.gae;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -27,14 +26,11 @@ import java.net.URLConnection;
 import java.util.Enumeration;
 import java.util.HashSet;
 
-import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.annotation.WebInitParam;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -47,14 +43,14 @@ import javax.servlet.http.HttpServletResponse;
  * EXPERIMENTAL Proxy servlet.
  * @author gregw
  *
- */
+ 
 @WebServlet(
         urlPatterns = {"/cn1-gae-cors-proxy"},
         initParams = { 
             @WebInitParam(name="targetUri", value="{_target}"),
             @WebInitParam(name="log", value="true")
         }
-)
+)*/
 public class GAEProxyServlet extends HttpServlet
 {
     
