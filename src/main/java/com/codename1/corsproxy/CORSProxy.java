@@ -6,12 +6,15 @@
 package com.codename1.corsproxy;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.HttpCookie;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Locale;
 import java.util.Vector;
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebInitParam;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.Cookie;
@@ -128,14 +131,52 @@ public class CORSProxy extends org.mitre.dsmiley.httpproxy.URITemplateProxyServl
     }
 
     @Override
-    protected void service(HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws ServletException, IOException {
-        super.service(servletRequest, servletResponse);
-        if (servletResponse.getStatus() >= 300 && servletResponse.getStatus() < 400) {
-            // XMLHTTPRequest automatically follows redirects.  We don't want that, so we'll
-            // convert 3xx status to non-standard header that we will parse on the other side.
-            servletResponse.setIntHeader("X-CN1-Status", servletResponse.getStatus());
-            servletResponse.setStatus(200);
-        }
+    protected void service(HttpServletRequest servletRequest, HttpServletResponse r) throws ServletException, IOException {
+        super.service(servletRequest, new HttpServletResponseWrapper(r) {
+             @Override
+            public void setStatus(int sc) {
+                if (sc < 200 || sc >= 300) {
+                    // XMLHTTPRequest automatically follows redirects.  We don't want that, so we'll
+                    // convert 3xx status to non-standard header that we will parse on the other side.
+                    super.setIntHeader("X-CN1-Status", sc);
+                    super.setStatus(200);
+                    return;
+                }
+                super.setStatus(sc);
+            }
+
+            @Override
+            public void setStatus(int sc, String sm) {
+                if (sc < 200 || sc >= 300) {
+                    // XMLHTTPRequest automatically follows redirects.  We don't want that, so we'll
+                    // convert 3xx status to non-standard header that we will parse on the other side.
+                    super.setIntHeader("X-CN1-Status", sc);
+                    super.setStatus(200, sm);
+                    return;
+                }
+                super.setStatus(sc, sm);
+            }
+
+            @Override
+            public void sendError(int sc) throws IOException {
+                setStatus(sc, "A server error occurred");
+                this.getOutputStream().close();
+            }
+
+            @Override
+            public void sendRedirect(String location) throws IOException {
+                setStatus(302);
+                addHeader("X-CN1-Location", location);
+                this.getOutputStream().close();
+                
+            }
+            
+            
+            
+        });
+                
+        
+        
     }
     
     
