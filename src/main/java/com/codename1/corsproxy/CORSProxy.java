@@ -6,18 +6,11 @@
 package com.codename1.corsproxy;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.HttpCookie;
-import java.util.Collection;
 import java.util.Enumeration;
-import java.util.List;
-import java.util.Locale;
 import java.util.Vector;
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebInitParam;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
@@ -53,43 +46,55 @@ public class CORSProxy extends org.mitre.dsmiley.httpproxy.URITemplateProxyServl
     @Override
     protected void copyProxyCookie(HttpServletRequest servletRequest,
             HttpServletResponse servletResponse, Header header) {
-        List<HttpCookie> cookies = HttpCookie.parse(header.getValue());
-        String path = servletRequest.getContextPath(); // path starts with / or is empty string
-        path += servletRequest.getServletPath(); // servlet path starts with / or is empty string
-
-        for (HttpCookie cookie : cookies) {
-            //set cookie name prefixed w/ a proxy value so it won't collide w/ other cookies
-            String proxyCookieName = getCookieNamePrefix() + cookie.getName();
-            Cookie servletCookie = new Cookie(proxyCookieName, cookie.getValue());
-            servletCookie.setComment(cookie.getComment());
-            servletCookie.setMaxAge((int) cookie.getMaxAge());
-            servletCookie.setPath(path); //set to the path of the proxy servlet
-            // don't set cookie domain
-            //servletCookie.setSecure(cookie.getSecure());
-            servletCookie.setSecure(false);
-            servletCookie.setVersion(cookie.getVersion());
-            servletResponse.addCookie(servletCookie);
-        }
+//        List<HttpCookie> cookies = HttpCookie.parse(header.getValue());
+//        String path = servletRequest.getContextPath(); // path starts with / or is empty string
+//        path += servletRequest.getServletPath(); // servlet path starts with / or is empty string
+//
+//        for (HttpCookie cookie : cookies) {
+//            //set cookie name prefixed w/ a proxy value so it won't collide w/ other cookies
+//            String proxyCookieName = getCookieNamePrefix() + cookie.getName();
+//            //HttpCookie hc = new HttpCookie()
+//            HttpCookie servletCookie = new HttpCookie(proxyCookieName, cookie.getValue());
+//            servletCookie.setComment(cookie.getComment());
+//            servletCookie.setMaxAge((int) cookie.getMaxAge());
+//            if (cookie.getPath() != null) {
+//                servletCookie.setPath(cookie.getPath());
+//            }
+//            
+//            if (cookie.getDomain() != null) {
+//                servletCookie.setDomain(cookie.getDomain());
+//            }
+//            //servletCookie.setDomain(cookie.getDomain());
+//            
+//            //servletCookie.setPath(path); //set to the path of the proxy servlet
+//            // don't set cookie domain
+//            //servletCookie.setSecure(cookie.getSecure());
+//            servletCookie.setSecure(false);
+//            servletCookie.setVersion(cookie.getVersion());
+//            //servletResponse.addCookie(servletCookie);
+//            servletResponse.addHeader("X-CN1-Set-Cookie", cookie.toString().replaceAll);
+//        }
+        servletResponse.addHeader("X-CN1-Set-Cookie", header.getValue());
     }
 
     protected String getRealCookie(String cookieValue) {
-        StringBuilder escapedCookie = new StringBuilder();
-        String cookies[] = cookieValue.split("; ");
-        for (String cookie : cookies) {
-            String cookieSplit[] = cookie.split("=");
-            if (cookieSplit.length == 2) {
-                String cookieName = cookieSplit[0];
-                if (cookieName.startsWith(getCookieNamePrefix())) {
-                    cookieName = cookieName.substring(getCookieNamePrefix().length());
-                    if (escapedCookie.length() > 0) {
-                        escapedCookie.append("; ");
-                    }
-                    escapedCookie.append(cookieName).append("=").append(cookieSplit[1]);
-                }
-            }
-
-            cookieValue = escapedCookie.toString();
-        }
+//        StringBuilder escapedCookie = new StringBuilder();
+//        String cookies[] = cookieValue.split("; ");
+//        for (String cookie : cookies) {
+//            String cookieSplit[] = cookie.split("=");
+//            if (cookieSplit.length == 2) {
+//                String cookieName = cookieSplit[0];
+//                if (cookieName.startsWith(getCookieNamePrefix())) {
+//                    cookieName = cookieName.substring(getCookieNamePrefix().length());
+//                    if (escapedCookie.length() > 0) {
+//                        escapedCookie.append("; ");
+//                    }
+//                    escapedCookie.append(cookieName).append("=").append(cookieSplit[1]);
+//                }
+//            }
+//
+//            cookieValue = escapedCookie.toString();
+//        }
         return cookieValue;
     }
 
@@ -103,10 +108,10 @@ public class CORSProxy extends org.mitre.dsmiley.httpproxy.URITemplateProxyServl
 
             @Override
             public void addHeader(String name, String value) {
-                if ("Location".equalsIgnoreCase(name)) {
+                if ("Location".equalsIgnoreCase(name) || "Set-Cookie".equalsIgnoreCase(name)) {
                     super.addHeader("X-CN1-"+name, value);
                     
-                } else if ("Content-Security-Policy".equalsIgnoreCase(name)) {
+                } else if ("Content-Security-Policy".equalsIgnoreCase(name) ) {
                     
                 } else {
                     super.addHeader(name, value); 
@@ -118,14 +123,15 @@ public class CORSProxy extends org.mitre.dsmiley.httpproxy.URITemplateProxyServl
             
         };
         super.copyResponseHeaders(proxyResponse, servletRequest, responseWrapper); //To change body of generated methods, choose Tools | Templates.
+        /*
         servletResponse.setHeader("Access-Control-Expose-Headers", "Set-Cookie, Set-Cookie2");
-        Collection <String> cookies = servletResponse.getHeaders("Set-Cookie");
+        Header[] cookies = proxyResponse.getHeaders("Set-Cookie");
         if (cookies != null) {
-            for (String cookie : cookies) {
-                servletResponse.addHeader("X-CN1-Set-Cookie", cookie);
+            for (Header cookie : cookies) {
+                servletResponse.addHeader("X-CN1-Set-Cookie", cookie.getValue());
             }
         }
-        
+        */
         //servletResponse.setHeader("Access-Control-Allow-Origin", "*");
         
     }
