@@ -31,6 +31,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.annotation.WebInitParam;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -45,7 +47,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  
 @WebServlet(
-        urlPatterns = {"/cn1-gae-cors-proxy"},
+        urlPatterns = {"/cn1-cors-proxy"},
         initParams = { 
             @WebInitParam(name="targetUri", value="{_target}"),
             @WebInitParam(name="log", value="true")
@@ -182,6 +184,10 @@ public class GAEProxyServlet extends HttpServlet
                         if ("origin".equals(hdr.toLowerCase()) && "null".equals(val)){
                            continue;
                         }
+                        if ("x-cn1-cookie".equals(hdr.toLowerCase())) {
+                            connection.addRequestProperty("Cookie", val);
+                            continue;
+                        }
                         connection.addRequestProperty(hdr,val);
                         context.log("req "+hdr+": "+val);
                         xForwardedFor|="X-Forwarded-For".equalsIgnoreCase(hdr);
@@ -265,7 +271,11 @@ public class GAEProxyServlet extends HttpServlet
             {
                 String lhdr = hdr!=null?hdr.toLowerCase():null;
                 if (hdr!=null && val!=null && !_DontProxyHeaders.contains(lhdr)) {
-                    response.addHeader(hdr,val);
+                    if("set-cookie".equals(hdr.toLowerCase())) {
+                        response.addHeader("X-CN1-Set-Cookie", val);
+                    } else {
+                        response.addHeader(hdr,val);
+                    }
                     
                 }
 
@@ -277,7 +287,7 @@ public class GAEProxyServlet extends HttpServlet
                 val=connection.getHeaderField(h);
             }
             //response.addHeader("Via","1.1 (jetty)");
-            response.addHeader("Access-Control-Allow-Origin", "*");
+            //response.addHeader("Access-Control-Allow-Origin", "*");
 
             // Handle
             if (proxy_in!=null){
