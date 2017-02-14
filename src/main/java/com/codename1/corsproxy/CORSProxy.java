@@ -141,7 +141,7 @@ public class CORSProxy extends org.mitre.dsmiley.httpproxy.URITemplateProxyServl
         super.service(servletRequest, new HttpServletResponseWrapper(r) {
              @Override
             public void setStatus(int sc) {
-                if (sc < 200 || sc >= 300) {
+                if ((sc < 200 || sc >= 300) && sc != 304) {
                     // XMLHTTPRequest automatically follows redirects.  We don't want that, so we'll
                     // convert 3xx status to non-standard header that we will parse on the other side.
                     super.setIntHeader("X-CN1-Status", sc);
@@ -153,7 +153,7 @@ public class CORSProxy extends org.mitre.dsmiley.httpproxy.URITemplateProxyServl
 
             @Override
             public void setStatus(int sc, String sm) {
-                if (sc < 200 || sc >= 300) {
+                if ((sc < 200 || sc >= 300) && sc != 304) {
                     // XMLHTTPRequest automatically follows redirects.  We don't want that, so we'll
                     // convert 3xx status to non-standard header that we will parse on the other side.
                     super.setIntHeader("X-CN1-Status", sc);
